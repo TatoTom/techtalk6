@@ -17,3 +17,11 @@ class LoginPage(BasePage):
         password_input.send_keys(password)
         submit_button = self.driver.find_element(*OwnCloudLoginPageLocators.SUBMIT_BUTTON_ID)
         submit_button.click()
+
+    def get_logged_user_text(self):
+        display_name = self.driver.find_element(*OwnCloudMainPageLocators.USER_DISPLAY_NAME)
+        return display_name.text
+
+    def get_lost_password_text(self):
+        lost_password = self.driver.find_element(*OwnCloudLoginPageLocators.LOST_PASSWORD_INFO_ID)
+        return lost_password.text

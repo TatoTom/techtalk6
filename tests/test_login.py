@@ -1,8 +1,7 @@
 import subprocess
 import time
-from selenium import webdriver
 from dotenv import load_dotenv
-from locators import OwnCloudLoginPageLocators, OwnCloudMainPageLocators
+from locators import OwnCloudLoginPageLocators
 from pages import LoginPage
 
 
@@ -23,31 +22,23 @@ def docker_compose_down():
     time.sleep(10)
 
 
-def test_login_correct_credentials():
+def test_login_correct_credentials(chrome_browser):
     CORRECT_USERNAME = 'admin'
     CORRECT_PASSWORD = 'admin'
-    OWNCLOUD_URL = 'http://localhost:8080'
 
-    driver = webdriver.Chrome()
-    driver.set_page_load_timeout(30)
-    driver.get(OWNCLOUD_URL)
-    owncloud = LoginPage(driver)
+    owncloud = LoginPage(chrome_browser)
     owncloud.login(username=CORRECT_USERNAME, password=CORRECT_PASSWORD)
-    display_name = driver.find_element(*OwnCloudMainPageLocators.USER_DISPLAY_NAME)
-    assert display_name.text == CORRECT_USERNAME
-    driver.quit()
+    logged_user_text = owncloud.get_logged_user_text()
+
+    assert logged_user_text == CORRECT_USERNAME
 
 
-def test_login_incorrect_credentials():
+def test_login_incorrect_credentials(chrome_browser):
     INCORRECT_USERNAME = 'username'
     INCORRECT_PASSWORD = 'qwerty'
-    OWNCLOUD_URL = 'http://localhost:8080'
 
-    driver = webdriver.Chrome()
-    driver.set_page_load_timeout(30)
-    driver.get(OWNCLOUD_URL)
-    owncloud = LoginPage(driver)
+    owncloud = LoginPage(chrome_browser)
     owncloud.login(username=INCORRECT_USERNAME, password=INCORRECT_PASSWORD)
-    lost_password = driver.find_element(*OwnCloudLoginPageLocators.LOST_PASSWORD_INFO_ID)
-    assert lost_password.text.strip() == OwnCloudLoginPageLocators.LOST_PASSWORD_INFO_TEXT
-    driver.quit()
+    lost_password_text = owncloud.get_lost_password_text()
+
+    assert lost_password_text.strip() == OwnCloudLoginPageLocators.LOST_PASSWORD_INFO_TEXT
